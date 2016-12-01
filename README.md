@@ -1,7 +1,13 @@
 ## NIPT_CLEANER
 This package contain programs for cleaning NIPT phenotype record data.
 
-Some usage:
+Install
+
+```
+$ git clone git@github.com:ShujiaHuang/nipt_cleaner.git
+```
+
+Some usages:
 
 * Clean the NIFTY record data
 
