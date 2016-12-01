@@ -1,0 +1,4 @@
+*.sh
+*.py[cxd]
+trash/
+tmp/
