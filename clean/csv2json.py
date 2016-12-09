@@ -7,8 +7,8 @@ import argparse
 import csv
 import json
 
-#reload(sys)
-#sys.setdefaultencoding('utf-8')
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 def csv2json():
     #Get Command Line Arguments
@@ -28,14 +28,15 @@ def csv2json():
     # read CSV file
     with open(opt.infile) if opt.infile else sys.stdin as fh:
         reader = csv.DictReader(fh)
-        title = reader.fieldnames
+        title = [h.replace(u'\ufeff', '').replace('"', '') for h in reader.fieldnames]
 
         if len(colnames) == 0:
             colnames = set([c.upper() for c in title])
 
         for row in reader:
+            row = {k.replace(u'\ufeff', '').replace('"', ''):v for k,v in row.items()}
             try:
-                csv_rows = {str.lower(title[i]):unicode(row[title[i]], 'utf-8')
+                csv_rows = {title[i].lower():unicode(row[title[i]], 'utf-8')
                             for i in range(len(title)) if title[i] in colnames}
             except UnicodeDecodeError:
                 print >> sys.stderr, '[WARNING] UnicodeDecodeError', row
@@ -44,36 +45,14 @@ def csv2json():
             if opt.is_out_pretty:
                 pretty_outdata.append(tmp_dict)
             else:
-                print json.dumps(csv_rows, ensure_ascii=False)
+
+                try:
+                    print json.dumps(csv_rows, ensure_ascii=False)
+                except UnicodeEncodeError:
+                    print >> sys.stderr, '[WARNING] UnicodeDecodeError', csv_rows, '\n', row
+                    sys.exit(1)
 
     if opt.is_out_pretty:
         print json.dumps(data, ensure_ascii=False, indent=4, sort_keys=True)
 
 
-#Read CSV File
-def read_csv(file, colname, format):
-
-    data = []
-    colnames = set([c.upper() for c in colname.split(',')])
-    with open(file) as csvfile:
-        reader = csv.DictReader(csvfile)
-        title = reader.fieldnames
-
-        if len(colnames) == 0:
-            colnames = set([c.upper() for c in title])
-
-        for row in reader:
-            try:
-                csv_rows = {str.lower(title[i]):unicode(row[title[i]], 'utf-8')
-                            for i in range(len(title)) if title[i] in colnames}
-            except UnicodeDecodeError:
-                print >> sys.stderr, '[WARNING] UnicodeDecodeError', row
-                continue
-
-            if format=='pretty':
-                data.append(csv_rows)
-            else:
-                print json.dumps(csv_rows, ensure_ascii=False)
-
-    if format=='pretty':
-        print json.dumps(data, ensure_ascii=False, indent=4, sort_keys=True)

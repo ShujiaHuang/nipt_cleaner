@@ -29,6 +29,11 @@ def extract_million_HPV():
     extraction_feature()
 
 
+def extract_million_hearingloss():
+    from clean.extract_million_hearingloss import extraction_feature
+    extraction_feature()
+
+
 def idmap():
     from clean.id_map import id_map
     id_map()
@@ -59,6 +64,7 @@ if __name__ == '__main__':
               'extraction': extraction,
               'extraction_million': extract_million,
               'extraction_million_HPV': extract_million_HPV,
+              'extractionhearingloss': extract_million_hearingloss,
               'id_map': idmap,
               'replace': replace_element,
               'combine': combine,
